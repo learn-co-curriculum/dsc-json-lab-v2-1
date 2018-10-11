@@ -3,7 +3,7 @@
 
 ## Introduction
 
-In this lecture, we'll continue investigating new formats for datasets. Specifically, we'll investigate two of the most popular data formats for the web: JSON and XML including strenghts and weaknesses.
+In this lab, we'll continue investigating new formats for datasets. Specifically, we'll investigate two of the most popular data formats for the web: JSON and XML including strenghts and weaknesses.
 
 ## Objectives
 You will be able to:

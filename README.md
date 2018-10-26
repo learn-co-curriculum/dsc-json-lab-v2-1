@@ -1,53 +1,7 @@
 
-# JSON and XML
+# JSON Intro Lab
 
-## Introduction
-
-In this lab, we'll continue investigating new formats for datasets. Specifically, we'll investigate two of the most popular data formats for the web: JSON and XML including strenghts and weaknesses.
-
-## Objectives
-You will be able to:
-* Effectively use the JSON module to load and parse JSON documents
-* Read and access data stored in JSON and XML
-* Compare  and contrast the JSON and XML as data interchange types
-
-
-## XML
-
-
-```python
-import xml.etree.ElementTree as ET
-```
-
-### Create an XML tree and retrieve the root tag.
-
-
-```python
-#Your code here
-```
-
-### How many direct descendents does the root tag have?
-
-
-```python
-# Your code here
-```
-
-### How many different types of tags are there within the entire XML file?
-
-
-```python
-# Your code here
-```
-
-### Create a DataFrame listing the number of each type of tag. 
-Sort the DataFrame in descending order by the tag count. The first entry should demonstrate there are 286 row tags in the XML file.   
-(Your DataFrame will be a single column, so could also be thought of as a Series.)
-
-
-```python
-#Your code here
-```
+Here you'll get a little more practice working with JSON files before moving on to playing with APIs all on your own where you'll synthesize reading documentation, making get requests and then parsing JSON data.
 
 ### Open the same dataset from json
 

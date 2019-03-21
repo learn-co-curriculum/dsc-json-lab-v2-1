@@ -3,7 +3,7 @@
 
 ## Introduction
 
-In this lab, we'll continue investigating new formats for datasets. Specifically, we'll investigate two of the most popular data formats for the web: JSON and XML including strenghts and weaknesses.
+In this lab, you'll practice navigating JSON and XML data structures.
 
 ## Objectives
 You will be able to:
@@ -756,7 +756,6 @@ df.meta.iloc[0]
 
 
 #Your answer here
-The first row has invalidCells according to the meta data, and appears to have column names in other entries. It appears to be a faulty record of sorts.
 
 ## Summary
 

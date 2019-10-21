@@ -452,7 +452,7 @@ data['meta']['view']['columns']
 
 
 ### Create a DataFrame from your json data
-The previous two questions previewed one entry from the data object within the json file, as well as the column details associated with that data from the meta entry within the json file. Both should have 19 entries. Create a DataFrame of the data. Be sure to use the information from the meta entry to add appropriate column names to your DataFrame.
+The previous two questions previewed one entry from the data object within the json file, as well as the column details associated with that data from the meta entry within the json file. Both should have 19 entries. Create a pandas DataFrame of the data. Be sure to use the information from the meta entry to add appropriate column names to your DataFrame.
 
 
 ```python

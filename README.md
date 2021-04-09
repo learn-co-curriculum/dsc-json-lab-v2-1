@@ -1,4 +1,3 @@
-
 # JSON - Lab
 
 ## Introduction
@@ -6,42 +5,129 @@
 In this lab, you'll practice navigating JSON data structures.
 
 ## Objectives
+
 You will be able to:
-* Use the JSON module to load and parse JSON documents
 
-## JSON
+* Practice using Python to load and parse JSON documents
 
-### Open the dataset from json
+## Your Task: Find the Total Payments for Each Candidate
+
+We will be using the same dataset, `nyc_2001_campaign_finance.json`, as in the previous lesson. Recall that the description is:
+
+> A listing of public funds payments for candidates for City office during the 2001 election cycle
+
+For added context, the Ciy of New York provides matching funds for eligible contributions made to candidates, using various ratios depending on the contribution amount ([more details here](https://en.wikipedia.org/wiki/New_York_City_Campaign_Finance_Board#The_Campaign_Finance_Program)). So these are not the complete values of all funds raised by these candidates, they are the amounts matched by the city. For that reason we expect that some of the values will be identical for different candidates.
+
+Recall also that the dataset is separated into `meta`, which contains metadata, and `data`, which contains the actual campaign finance records. You will need to use the information in `meta` to understand how to interpret the information in `data`.
+
+Your goal is to create a list of tuples, where the first value in each tuple is the name of a candidate in the 2001 election, and the second value is the total payments they received. The structure should look like this:
+
+```python
+[
+    ("John Smith", 62184.00),
+    ("Jane Doe", 133146.00),
+    ...
+]
+```
+
+The list should contain 284 tuples, since there were 284 candidates.
+
+## Open the Dataset
+
+Import the `json` module, open the `nyc_2001_campaign_finance.json` file using the built-in Python `open` function, and load all of the data from the file into a Python object using `json.load`.
+
+Assign the result of `json.load` to the variable name `data`.
 
 
 ```python
-#Your code here
 import json
-f = open('nyc_2001_campaign_finance.json')
-data = json.load(f)
+
+with open('nyc_2001_campaign_finance.json') as f:
+    data = json.load(f)
 ```
 
-### What is the root data type of the json file?
+Recall the overall structure of this dataset:
 
 
 ```python
-### Your code here
-type(data)
+
+print(f"The overall data type is {type(data)}")
+print(f"The keys are {list(data.keys())}")
+print()
+print("The value associated with the 'meta' key has metadata, including all of these attributes:")
+print(list(data['meta']['view'].keys()))
+print()
+print(f"The value associated with the 'data' key is a list of {len(data['data'])} records")
+```
+
+    The overall data type is <class 'dict'>
+    The keys are ['meta', 'data']
+    
+    The value associated with the 'meta' key has metadata, including all of these attributes:
+    ['id', 'name', 'attribution', 'averageRating', 'category', 'createdAt', 'description', 'displayType', 'downloadCount', 'hideFromCatalog', 'hideFromDataJson', 'indexUpdatedAt', 'newBackend', 'numberOfComments', 'oid', 'provenance', 'publicationAppendEnabled', 'publicationDate', 'publicationGroup', 'publicationStage', 'rowClass', 'rowsUpdatedAt', 'rowsUpdatedBy', 'tableId', 'totalTimesRated', 'viewCount', 'viewLastModified', 'viewType', 'columns', 'grants', 'metadata', 'owner', 'query', 'rights', 'tableAuthor', 'tags', 'flags']
+    
+    The value associated with the 'data' key is a list of 285 records
+
+
+## Find the Column Names
+
+We know that each record in the data list looks something like this:
+
+
+```python
+data['data'][1]
 ```
 
 
 
 
-    dict
+    [2,
+     '9D257416-581A-4C42-85CC-B6EAD9DED97F',
+     2,
+     1315925633,
+     '392904',
+     1315925633,
+     '392904',
+     '{\n}',
+     '2001',
+     'B4',
+     'Aboulafia, Sandy',
+     '5',
+     None,
+     '44',
+     'P',
+     '45410.00',
+     '0',
+     '0',
+     '45410.00']
 
 
 
-### Navigate to the 'data' key of your loaded json object. What data type is this?
+We could probably guess which of those values is the candidate name, but it's unclear which value is the total payments received. To get that information, we need to look at the metadata.
+
+Investigate the value of `data['meta']['view']['columns']`. It currently contains significantly more information than we need. Extract just the values associated with the `name` keys, so we have a list of the column names.
+
+The result should look something like this:
+
+```python
+[
+    "sid",
+    "id",
+    "position",
+    ...
+]
+```
+
+Name this variable `column_names`.
 
 
 ```python
-#Your code here
-type(data['data'])
+
+# First, we look at data['meta']['view']['columns']
+# What is the data type?
+
+column_data = data['meta']['view']['columns']
+type(column_data)
 ```
 
 
@@ -51,44 +137,12 @@ type(data['data'])
 
 
 
-### Preview the first entry from the value returned by the 'data' key above.
-
 
 ```python
-#Your code here
-data['data'][0]
-```
 
-
-
-
-    [1,
-     'E3E9CC9F-7443-43F6-94AF-B5A0F802DBA1',
-     1,
-     1315925633,
-     '392904',
-     1315925633,
-     '392904',
-     '{\n  "invalidCells" : {\n    "1519001" : "TOTALPAY",\n    "1518998" : "PRIMARYPAY",\n    "1519000" : "RUNOFFPAY",\n    "1518999" : "GENERALPAY",\n    "1518994" : "OFFICECD",\n    "1518996" : "OFFICEDIST",\n    "1518991" : "ELECTION"\n  }\n}',
-     None,
-     'CANDID',
-     'CANDNAME',
-     None,
-     'OFFICEBORO',
-     None,
-     'CANCLASS',
-     None,
-     None,
-     None,
-     None]
-
-
-
-### Preview the Entry under meta -> view -> columns (the keys of three successively nested dictionaries)
-
-
-```python
-data['meta']['view']['columns']
+# With a list, it's often useful to look at the
+# first entry, or first few entries
+column_data[:3]
 ```
 
 
@@ -117,351 +171,151 @@ data['meta']['view']['columns']
       'position': 0,
       'renderTypeName': 'meta_data',
       'format': {},
-      'flags': ['hidden']},
-     {'id': -1,
-      'name': 'created_at',
-      'dataTypeName': 'meta_data',
-      'fieldName': ':created_at',
-      'position': 0,
-      'renderTypeName': 'meta_data',
-      'format': {},
-      'flags': ['hidden']},
-     {'id': -1,
-      'name': 'created_meta',
-      'dataTypeName': 'meta_data',
-      'fieldName': ':created_meta',
-      'position': 0,
-      'renderTypeName': 'meta_data',
-      'format': {},
-      'flags': ['hidden']},
-     {'id': -1,
-      'name': 'updated_at',
-      'dataTypeName': 'meta_data',
-      'fieldName': ':updated_at',
-      'position': 0,
-      'renderTypeName': 'meta_data',
-      'format': {},
-      'flags': ['hidden']},
-     {'id': -1,
-      'name': 'updated_meta',
-      'dataTypeName': 'meta_data',
-      'fieldName': ':updated_meta',
-      'position': 0,
-      'renderTypeName': 'meta_data',
-      'format': {},
-      'flags': ['hidden']},
-     {'id': -1,
-      'name': 'meta',
-      'dataTypeName': 'meta_data',
-      'fieldName': ':meta',
-      'position': 0,
-      'renderTypeName': 'meta_data',
-      'format': {},
-      'flags': ['hidden']},
-     {'id': 75768833,
-      'name': 'ELECTION',
-      'dataTypeName': 'number',
-      'fieldName': 'election',
-      'position': 2,
-      'renderTypeName': 'number',
-      'tableColumnId': 1518991,
-      'width': 196,
-      'cachedContents': {'non_null': 284,
-       'average': '2001',
-       'largest': '2001',
-       'null': 1,
-       'top': [{'item': '2001', 'count': 20}],
-       'smallest': '2001',
-       'sum': '568284'},
-      'format': {'precisionStyle': 'standard',
-       'noCommas': 'true',
-       'align': 'right'}},
-     {'id': 75768834,
-      'name': 'CANDID',
-      'dataTypeName': 'text',
-      'fieldName': 'candid',
-      'position': 3,
-      'renderTypeName': 'text',
-      'tableColumnId': 1518992,
-      'width': 172,
-      'cachedContents': {'non_null': 285,
-       'largest': 'YA',
-       'null': 0,
-       'top': [{'item': '490', 'count': 20},
-        {'item': '577', 'count': 19},
-        {'item': 'GF', 'count': 18},
-        {'item': '265', 'count': 17},
-        {'item': '549', 'count': 16},
-        {'item': '260', 'count': 15},
-        {'item': 'DH', 'count': 14},
-        {'item': '168', 'count': 13},
-        {'item': '561', 'count': 12},
-        {'item': '317', 'count': 11},
-        {'item': '240', 'count': 10},
-        {'item': 'B1', 'count': 9},
-        {'item': '337', 'count': 8},
-        {'item': '202', 'count': 7},
-        {'item': 'DP', 'count': 6},
-        {'item': '554', 'count': 5},
-        {'item': '529', 'count': 4},
-        {'item': '521', 'count': 3},
-        {'item': 'CY', 'count': 2},
-        {'item': '327', 'count': 1}],
-       'smallest': '148'},
-      'format': {}},
-     {'id': 75768835,
-      'name': 'CANDNAME',
-      'dataTypeName': 'text',
-      'fieldName': 'candname',
-      'position': 4,
-      'renderTypeName': 'text',
-      'tableColumnId': 1518993,
-      'width': 196,
-      'cachedContents': {'non_null': 285,
-       'largest': 'Zett, Lori M',
-       'null': 0,
-       'top': [{'item': 'Taitt, Samuel A', 'count': 20},
-        {'item': 'Taliaferro, Phyllis', 'count': 19},
-        {'item': 'Taveras, Germania', 'count': 18},
-        {'item': 'Thakral, Jairam D', 'count': 17},
-        {'item': 'Thomas, Carl W', 'count': 16},
-        {'item': 'Thompson, Jr., William C', 'count': 15},
-        {'item': 'Tiraco, Joseph E', 'count': 14},
-        {'item': 'Toney, Vaughan', 'count': 13},
-        {'item': 'Toppin, Roger N', 'count': 12},
-        {'item': 'Torres, Mario A', 'count': 11},
-        {'item': 'Vallone, Jr., Peter F', 'count': 10},
-        {'item': 'Vallone, Peter F', 'count': 9},
-        {'item': 'Van Bramer, James G', 'count': 8},
-        {'item': 'Vann, Albert', 'count': 7},
-        {'item': 'Vargas, Ruben Dario', 'count': 6},
-        {'item': 'Vassos, Sandra', 'count': 5},
-        {'item': 'Vernet, Jean D', 'count': 4},
-        {'item': 'Viest, Nicholas D', 'count': 3},
-        {'item': 'Villaverde, Sergio', 'count': 2},
-        {'item': 'Vogel, Mark H', 'count': 1}],
-       'smallest': 'Aboulafia, Sandy'},
-      'format': {}},
-     {'id': 75768836,
-      'name': 'OFFICECD',
-      'dataTypeName': 'number',
-      'fieldName': 'officecd',
-      'position': 5,
-      'renderTypeName': 'number',
-      'tableColumnId': 1518994,
-      'width': 196,
-      'cachedContents': {'non_null': 284,
-       'average': '4.700704225352113',
-       'largest': '5',
-       'null': 1,
-       'top': [{'item': '5', 'count': 20},
-        {'item': '1', 'count': 19},
-        {'item': '3', 'count': 18},
-        {'item': '4', 'count': 17},
-        {'item': '2', 'count': 16}],
-       'smallest': '1',
-       'sum': '1335'},
-      'format': {}},
-     {'id': 75768837,
-      'name': 'OFFICEBORO',
-      'dataTypeName': 'text',
-      'fieldName': 'officeboro',
-      'position': 6,
-      'renderTypeName': 'text',
-      'tableColumnId': 1518995,
-      'width': 220,
-      'cachedContents': {'non_null': 21,
-       'largest': 'X',
-       'null': 264,
-       'top': [{'item': 'OFFICEBORO', 'count': 20},
-        {'item': 'X', 'count': 19},
-        {'item': 'M', 'count': 18},
-        {'item': 'K', 'count': 17},
-        {'item': 'Q', 'count': 16},
-        {'item': 'S', 'count': 15}],
-       'smallest': 'K'},
-      'format': {}},
-     {'id': 75768838,
-      'name': 'OFFICEDIST',
-      'dataTypeName': 'number',
-      'fieldName': 'officedist',
-      'position': 7,
-      'renderTypeName': 'number',
-      'tableColumnId': 1518996,
-      'width': 220,
-      'cachedContents': {'non_null': 245,
-       'average': '26.33061224489796',
-       'largest': '51',
-       'null': 40,
-       'top': [{'item': '7', 'count': 20},
-        {'item': '32', 'count': 19},
-        {'item': '37', 'count': 18},
-        {'item': '28', 'count': 17},
-        {'item': '19', 'count': 16},
-        {'item': '39', 'count': 15},
-        {'item': '35', 'count': 14},
-        {'item': '42', 'count': 13},
-        {'item': '31', 'count': 12},
-        {'item': '6', 'count': 11},
-        {'item': '47', 'count': 10},
-        {'item': '20', 'count': 9},
-        {'item': '1', 'count': 8},
-        {'item': '27', 'count': 7},
-        {'item': '26', 'count': 6},
-        {'item': '10', 'count': 5},
-        {'item': '34', 'count': 4},
-        {'item': '45', 'count': 3},
-        {'item': '40', 'count': 2},
-        {'item': '12', 'count': 1}],
-       'smallest': '1',
-       'sum': '6451'},
-      'format': {}},
-     {'id': 75768839,
-      'name': 'CANCLASS',
-      'dataTypeName': 'text',
-      'fieldName': 'canclass',
-      'position': 8,
-      'renderTypeName': 'text',
-      'tableColumnId': 1518997,
-      'width': 196,
-      'cachedContents': {'non_null': 285,
-       'largest': 'P',
-       'null': 0,
-       'top': [{'item': 'CANCLASS', 'count': 20}, {'item': 'P', 'count': 19}],
-       'smallest': 'CANCLASS'},
-      'format': {}},
-     {'id': 75768840,
-      'name': 'PRIMARYPAY',
-      'dataTypeName': 'number',
-      'fieldName': 'primarypay',
-      'position': 9,
-      'renderTypeName': 'number',
-      'tableColumnId': 1518998,
-      'width': 220,
-      'cachedContents': {'non_null': 284,
-       'average': '112243.9612676056',
-       'largest': '2846148.00',
-       'null': 1,
-       'top': [{'item': '75350.00', 'count': 20},
-        {'item': '0', 'count': 19},
-        {'item': '91333.00', 'count': 18},
-        {'item': '69780.00', 'count': 17},
-        {'item': '22172.00', 'count': 16},
-        {'item': '65356.00', 'count': 15},
-        {'item': '11423.00', 'count': 14},
-        {'item': '60152.00', 'count': 13},
-        {'item': '75040.00', 'count': 12},
-        {'item': '62436.00', 'count': 11},
-        {'item': '42075.00', 'count': 10},
-        {'item': '74920.00', 'count': 9},
-        {'item': '38088.00', 'count': 8},
-        {'item': '74850.00', 'count': 7},
-        {'item': '89502.00', 'count': 6},
-        {'item': '74350.00', 'count': 5},
-        {'item': '58348.00', 'count': 4},
-        {'item': '55100.00', 'count': 3},
-        {'item': '508893.00', 'count': 2},
-        {'item': '74750.00', 'count': 1}],
-       'smallest': '0',
-       'sum': '31877285.00'},
-      'format': {}},
-     {'id': 75768841,
-      'name': 'GENERALPAY',
-      'dataTypeName': 'number',
-      'fieldName': 'generalpay',
-      'position': 10,
-      'renderTypeName': 'number',
-      'tableColumnId': 1518999,
-      'width': 220,
-      'cachedContents': {'non_null': 284,
-       'average': '28753.57394366197',
-       'largest': '976545.00',
-       'null': 1,
-       'top': [{'item': '0', 'count': 20},
-        {'item': '75350.00', 'count': 19},
-        {'item': '201131.00', 'count': 18},
-        {'item': '39760.00', 'count': 17},
-        {'item': '57796.00', 'count': 16},
-        {'item': '75200.00', 'count': 15},
-        {'item': '68234.00', 'count': 14},
-        {'item': '5732.00', 'count': 13},
-        {'item': '58488.00', 'count': 12},
-        {'item': '62184.00', 'count': 11},
-        {'item': '44748.00', 'count': 10},
-        {'item': '21946.00', 'count': 9},
-        {'item': '70500.00', 'count': 8}],
-       'smallest': '0',
-       'sum': '8166015.00'},
-      'format': {}},
-     {'id': 75768842,
-      'name': 'RUNOFFPAY',
-      'dataTypeName': 'number',
-      'fieldName': 'runoffpay',
-      'position': 11,
-      'renderTypeName': 'number',
-      'tableColumnId': 1519000,
-      'width': 208,
-      'cachedContents': {'non_null': 284,
-       'average': '7776.778169014085',
-       'largest': '711537.00',
-       'null': 1,
-       'top': [{'item': '0', 'count': 20},
-        {'item': '267331.00', 'count': 19},
-        {'item': '574387.00', 'count': 18},
-        {'item': '303270.00', 'count': 17},
-        {'item': '711537.00', 'count': 16},
-        {'item': '114407.00', 'count': 15},
-        {'item': '237673.00', 'count': 14}],
-       'smallest': '0',
-       'sum': '2208605.00'},
-      'format': {}},
-     {'id': 75768843,
-      'name': 'TOTALPAY',
-      'dataTypeName': 'number',
-      'fieldName': 'totalpay',
-      'position': 12,
-      'renderTypeName': 'number',
-      'tableColumnId': 1519001,
-      'width': 196,
-      'cachedContents': {'non_null': 284,
-       'average': '148774.3133802817',
-       'largest': '4534230.00',
-       'null': 1,
-       'top': [{'item': '0', 'count': 20},
-        {'item': '75350.00', 'count': 19},
-        {'item': '150700.00', 'count': 18},
-        {'item': '2458534.00', 'count': 17},
-        {'item': '133146.00', 'count': 16},
-        {'item': '75200.00', 'count': 15},
-        {'item': '68234.00', 'count': 14},
-        {'item': '70664.00', 'count': 13},
-        {'item': '58488.00', 'count': 12},
-        {'item': '50112.00', 'count': 11},
-        {'item': '62184.00', 'count': 10},
-        {'item': '44748.00', 'count': 9},
-        {'item': '21946.00', 'count': 8},
-        {'item': '41656.00', 'count': 7},
-        {'item': '61260.00', 'count': 6},
-        {'item': '145850.00', 'count': 5},
-        {'item': '35808.00', 'count': 4},
-        {'item': '12172.00', 'count': 3}],
-       'smallest': '0',
-       'sum': '42251905.00'},
-      'format': {}}]
+      'flags': ['hidden']}]
 
 
-
-### Create a DataFrame from your json data
-The previous two questions previewed one entry from the data object within the json file, as well as the column details associated with that data from the meta entry within the json file. Both should have 19 entries. Create a pandas DataFrame of the data. Be sure to use the information from the meta entry to add appropriate column names to your DataFrame.
 
 
 ```python
-#Your code here
+
+# So, we have a list of dictionaries. We note that
+# each dictionary has the key 'name' like was mentioned
+# previously
+
+# To extract the names, let's use a list comprehension
+column_names = [info['name'] for info in column_data]
+column_names
+```
+
+
+
+
+    ['sid',
+     'id',
+     'position',
+     'created_at',
+     'created_meta',
+     'updated_at',
+     'updated_meta',
+     'meta',
+     'ELECTION',
+     'CANDID',
+     'CANDNAME',
+     'OFFICECD',
+     'OFFICEBORO',
+     'OFFICEDIST',
+     'CANCLASS',
+     'PRIMARYPAY',
+     'GENERALPAY',
+     'RUNOFFPAY',
+     'TOTALPAY']
+
+
+
+
+```python
+
+# There should be 19 names
+assert len(column_names) == 19
+# CANDNAME and TOTALPAY should be in there
+assert "CANDNAME" in column_names and "TOTALPAY" in column_names
+```
+
+Ok, now we know what each of the columns represents.
+
+The columns we are looking for are called `CANDNAME` and `TOTALPAY`. Now that we have this list, we should be able to figure out which of the values in each record lines up with those column names.
+
+## Loop Over the Records to Find the Names and Payments
+
+The data records are contained in `data['data']`. Recall that the first (`0`-th) one is more of a header and should be skipped over.
+
+Loop over the records in `data['data']` and extract the name and total payment from the city. Make sure you convert the total payment to a float, then make a tuple representing that candidate. Append the tuple to an overall list of results called `candidate_total_payments`.
+
+
+```python
+
+# In theory we could just look at the list and
+# count by hand to figure out the index of these
+# strings, but Python can do it for us
+name_index = column_names.index("CANDNAME")
+total_payments_index = column_names.index("TOTALPAY")
+
+print("The candidate name is at index", name_index)
+print("The total payment amout is at index", total_payments_index)
+```
+
+    The candidate name is at index 10
+    The total payment amout is at index 18
+
+
+
+```python
+
+candidate_total_payments = []
+
+# Loop over records starting at index 1 to skip header
+for record in data['data'][1:]:
+    name = record[name_index]
+    total_payments = float(record[total_payments_index])
+    candidate_total_payments.append((name, total_payments))
+    
+# Print the first five and last five
+print(candidate_total_payments[:5])
+print(candidate_total_payments[-5:])
+```
+
+    [('Aboulafia, Sandy', 45410.0), ('Adams, Jackie R', 11073.0), ('Addabbo, Joseph P', 149320.0), ('Alamo-Estrada, Agustin', 27400.0), ('Allen, William A', 62990.0)]
+    [('Wilson, John H', 0.0), ('Wooten, Donald T', 0.0), ('Yassky, David', 150700.0), ('Zapiti, Mike', 12172.0), ('Zett, Lori M', 0.0)]
+
+
+
+```python
+
+# There should be 284 records
+assert len(candidate_total_payments) == 284
+
+# Each record should contain a tuple
+assert type(candidate_total_payments[0]) == tuple
+
+# That tuple should contain a string and a number
+assert len(candidate_total_payments[0]) == 2
+assert type(candidate_total_payments[0][0]) == str
+assert type(candidate_total_payments[0][1]) == float
+```
+
+Now that we have this result, we can answer questions like: *which candidates received the most total payments from the city*?
+
+
+```python
+
+# Print the top 10 candidates by total payments
+sorted(candidate_total_payments, key=lambda x: x[1], reverse=True)[:10]
+```
+
+
+
+
+    [('Green, Mark', 4534230.0),
+     ('Ferrer, Fernando', 2871933.0),
+     ('Hevesi, Alan G', 2641247.0),
+     ('Vallone, Peter F', 2458534.0),
+     ('Gotbaum, Betsy F', 1625090.0),
+     ('Berman, Herbert E', 1576860.0),
+     ('DiBrienza, Stephen', 1336655.0),
+     ('Stringer, Scott M', 1223721.0),
+     ('Markowitz, Marty', 1166294.0),
+     ('Thompson, Jr., William C', 1096359.0)]
+
+
+
+Since you found all of the column names, it is also possible to display all of the data in a nice tabular format using pandas. That code would look like this:
+
+
+```python
+
 import pandas as pd
-df = pd.DataFrame(data['data'])
-cols = [i['name'] for i in data['meta']['view']['columns']]
-df.columns = cols
-df.head()
+
+pd.DataFrame(data=data['data'][1:], columns=column_names)
 ```
 
 
@@ -509,28 +363,6 @@ df.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
-      <td>E3E9CC9F-7443-43F6-94AF-B5A0F802DBA1</td>
-      <td>1</td>
-      <td>1315925633</td>
-      <td>392904</td>
-      <td>1315925633</td>
-      <td>392904</td>
-      <td>{\n  "invalidCells" : {\n    "1519001" : "TOTA...</td>
-      <td>None</td>
-      <td>CANDID</td>
-      <td>CANDNAME</td>
-      <td>None</td>
-      <td>OFFICEBORO</td>
-      <td>None</td>
-      <td>CANCLASS</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>1</th>
       <td>2</td>
       <td>9D257416-581A-4C42-85CC-B6EAD9DED97F</td>
       <td>2</td>
@@ -552,7 +384,7 @@ df.head()
       <td>45410.00</td>
     </tr>
     <tr>
-      <th>2</th>
+      <th>1</th>
       <td>3</td>
       <td>B80D7891-93CF-49E8-86E8-182B618E68F2</td>
       <td>3</td>
@@ -574,7 +406,7 @@ df.head()
       <td>11073.00</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>2</th>
       <td>4</td>
       <td>BB012003-78F5-406D-8A87-7FF8A425EE3F</td>
       <td>4</td>
@@ -596,7 +428,7 @@ df.head()
       <td>149320.00</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>3</th>
       <td>5</td>
       <td>945825F9-2F5D-47C2-A16B-75B93E61E1AD</td>
       <td>5</td>
@@ -617,23 +449,164 @@ df.head()
       <td>0</td>
       <td>27400.00</td>
     </tr>
+    <tr>
+      <th>4</th>
+      <td>6</td>
+      <td>9546F502-39D6-4340-B37E-60682EB22274</td>
+      <td>6</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>{\n}</td>
+      <td>2001</td>
+      <td>BR</td>
+      <td>Allen, William A</td>
+      <td>5</td>
+      <td>None</td>
+      <td>9</td>
+      <td>P</td>
+      <td>62990.00</td>
+      <td>0</td>
+      <td>0</td>
+      <td>62990.00</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>279</th>
+      <td>281</td>
+      <td>C50E6A4C-BDE9-4F12-97F4-95D467013540</td>
+      <td>281</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>{\n}</td>
+      <td>2001</td>
+      <td>537</td>
+      <td>Wilson, John H</td>
+      <td>5</td>
+      <td>None</td>
+      <td>13</td>
+      <td>P</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>280</th>
+      <td>282</td>
+      <td>04C6D19F-FF63-47B0-B26D-3B8F98B4C16B</td>
+      <td>282</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>{\n}</td>
+      <td>2001</td>
+      <td>559</td>
+      <td>Wooten, Donald T</td>
+      <td>5</td>
+      <td>None</td>
+      <td>42</td>
+      <td>P</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>281</th>
+      <td>283</td>
+      <td>A451E0E9-D382-4A97-AAD8-D7D382055F8D</td>
+      <td>283</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>{\n}</td>
+      <td>2001</td>
+      <td>280</td>
+      <td>Yassky, David</td>
+      <td>5</td>
+      <td>None</td>
+      <td>33</td>
+      <td>P</td>
+      <td>75350.00</td>
+      <td>75350.00</td>
+      <td>0</td>
+      <td>150700.00</td>
+    </tr>
+    <tr>
+      <th>282</th>
+      <td>284</td>
+      <td>E84BCD0C-D6F4-450F-B55B-3199A265C781</td>
+      <td>284</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>{\n}</td>
+      <td>2001</td>
+      <td>274</td>
+      <td>Zapiti, Mike</td>
+      <td>5</td>
+      <td>None</td>
+      <td>22</td>
+      <td>P</td>
+      <td>12172.00</td>
+      <td>0</td>
+      <td>0</td>
+      <td>12172.00</td>
+    </tr>
+    <tr>
+      <th>283</th>
+      <td>285</td>
+      <td>5BBC9676-2119-4FB5-9DAB-DE3F71B7681A</td>
+      <td>285</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>1315925633</td>
+      <td>392904</td>
+      <td>{\n}</td>
+      <td>2001</td>
+      <td>442</td>
+      <td>Zett, Lori M</td>
+      <td>5</td>
+      <td>None</td>
+      <td>24</td>
+      <td>P</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
   </tbody>
 </table>
+<p>284 rows × 19 columns</p>
 </div>
-
-
-
-### What's wrong with the first row of the DataFrame?
-
-
-```python
-df.meta.iloc[0]
-```
-
-
-
-
-    '{\n  "invalidCells" : {\n    "1519001" : "TOTALPAY",\n    "1518998" : "PRIMARYPAY",\n    "1519000" : "RUNOFFPAY",\n    "1518999" : "GENERALPAY",\n    "1518994" : "OFFICECD",\n    "1518996" : "OFFICEDIST",\n    "1518991" : "ELECTION"\n  }\n}'
 
 
 

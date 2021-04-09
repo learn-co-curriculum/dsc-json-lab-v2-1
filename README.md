@@ -1,4 +1,3 @@
-
 # JSON - Lab
 
 ## Introduction
@@ -6,64 +5,151 @@
 In this lab, you'll practice navigating JSON data structures.
 
 ## Objectives
+
 You will be able to:
-* Use the JSON module to load and parse JSON documents
 
-## JSON
+* Practice using Python to load and parse JSON documents
 
-### Open the dataset from json
+## Your Task: Find the Total Payments for Each Candidate
 
+We will be using the same dataset, `nyc_2001_campaign_finance.json`, as in the previous lesson. Recall that the description is:
 
-```python
-#Your code here
-```
+> A listing of public funds payments for candidates for City office during the 2001 election cycle
 
-### What is the root data type of the json file?
+For added context, the Ciy of New York provides matching funds for eligible contributions made to candidates, using various ratios depending on the contribution amount ([more details here](https://en.wikipedia.org/wiki/New_York_City_Campaign_Finance_Board#The_Campaign_Finance_Program)). So these are not the complete values of all funds raised by these candidates, they are the amounts matched by the city. For that reason we expect that some of the values will be identical for different candidates.
 
+Recall also that the dataset is separated into `meta`, which contains metadata, and `data`, which contains the actual campaign finance records. You will need to use the information in `meta` to understand how to interpret the information in `data`.
 
-```python
-### Your code here
-```
-
-### Navigate to the 'data' key of your loaded json object. What data type is this?
-
+Your goal is to create a list of tuples, where the first value in each tuple is the name of a candidate in the 2001 election, and the second value is the total payments they received. The structure should look like this:
 
 ```python
-#Your code here
+[
+    ("John Smith", 62184.00),
+    ("Jane Doe", 133146.00),
+    ...
+]
 ```
 
-### Preview the first entry from the value returned by the 'data' key above.
+The list should contain 284 tuples, since there were 284 candidates.
 
+## Open the Dataset
 
-```python
-#Your code here
-```
+Import the `json` module, open the `nyc_2001_campaign_finance.json` file using the built-in Python `open` function, and load all of the data from the file into a Python object using `json.load`.
 
-### Preview the Entry under meta -> view -> columns (the keys of three successively nested dictionaries)
+Assign the result of `json.load` to the variable name `data`.
 
 
 ```python
 # Your code here
 ```
 
-### Create a DataFrame from your json data
-The previous two questions previewed one entry from the data object within the json file, as well as the column details associated with that data from the meta entry within the json file. Both should have 19 entries. Create a pandas DataFrame of the data. Be sure to use the information from the meta entry to add appropriate column names to your DataFrame.
+Recall the overall structure of this dataset:
 
 
 ```python
-#Your code here
+# Run this cell without changes
+
+print(f"The overall data type is {type(data)}")
+print(f"The keys are {list(data.keys())}")
+print()
+print("The value associated with the 'meta' key has metadata, including all of these attributes:")
+print(list(data['meta']['view'].keys()))
+print()
+print(f"The value associated with the 'data' key is a list of {len(data['data'])} records")
 ```
 
-### What's wrong with the first row of the DataFrame?
+## Find the Column Names
+
+We know that each record in the data list looks something like this:
 
 
 ```python
-#Your code here
+# Run this cell without changes
+data['data'][1]
+```
+
+We could probably guess which of those values is the candidate name, but it's unclear which value is the total payments received. To get that information, we need to look at the metadata.
+
+Investigate the value of `data['meta']['view']['columns']`. It currently contains significantly more information than we need. Extract just the values associated with the `name` keys, so we have a list of the column names.
+
+The result should look something like this:
+
+```python
+[
+    "sid",
+    "id",
+    "position",
+    ...
+]
+```
+
+Name this variable `column_names`.
+
+
+```python
+# Your code here (create more cells as needed)
 ```
 
 
 ```python
-#Your answer here
+# Run this cell without changes
+
+# There should be 19 names
+assert len(column_names) == 19
+# CANDNAME and TOTALPAY should be in there
+assert "CANDNAME" in column_names and "TOTALPAY" in column_names
+```
+
+Ok, now we know what each of the columns represents.
+
+The columns we are looking for are called `CANDNAME` and `TOTALPAY`. Now that we have this list, we should be able to figure out which of the values in each record lines up with those column names.
+
+## Loop Over the Records to Find the Names and Payments
+
+The data records are contained in `data['data']`. Recall that the first (`0`-th) one is more of a header and should be skipped over.
+
+Loop over the records in `data['data']` and extract the name and total payment from the city. Make sure you convert the total payment to a float, then make a tuple representing that candidate. Append the tuple to an overall list of results called `candidate_total_payments`.
+
+
+```python
+# Your code here (create more cells as needed)
+```
+
+
+```python
+# Run this cell without changes
+
+# There should be 284 records
+assert len(candidate_total_payments) == 284
+
+# Each record should contain a tuple
+assert type(candidate_total_payments[0]) == tuple
+
+# That tuple should contain a string and a number
+assert len(candidate_total_payments[0]) == 2
+assert type(candidate_total_payments[0][0]) == str
+assert type(candidate_total_payments[0][1]) == float
+```
+
+Now that we have this result, we can answer questions like: *which candidates received the most total payments from the city*?
+
+
+```python
+# Run this cell without changes
+
+# Print the top 10 candidates by total payments
+sorted(candidate_total_payments, key=lambda x: x[1], reverse=True)[:10]
+```
+
+Since you found all of the column names, it is also possible to display all of the data in a nice tabular format using pandas. That code would look like this:
+
+
+```python
+# Run this cell without changes
+
+import pandas as pd
+
+pd.DataFrame(data=data['data'][1:], columns=column_names)
 ```
 
 ## Summary

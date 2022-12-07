@@ -132,24 +132,15 @@ data['data'][1]
 
 We could probably guess which of those values is the candidate name, but it's unclear which value is the total payments received. To get that information, we need to look at the metadata.
 
-Investigate the value of `data['meta']['view']['columns']`. It currently contains significantly more information than we need. Extract just the values associated with the `name` keys, so we have a list of the column names.
+Investigate the value of `data['meta']['view']['columns']`.
 
-The result should look something like this:
-
-```python
-[
-    "sid",
-    "id",
-    "position",
-    ...
-]
-```
-
-Name this variable `column_names`.
+Let `data['meta']['view']['columns']` be called `column_data`. Verify that `column_data` results in a list.
 
 
 ```python
 # Your code here (create more cells as needed)
+column_data = None
+
 ```
 
 
@@ -169,6 +160,24 @@ type(column_data)
     list
 
 
+
+Now look at the first few entries of `column_data`.
+
+The result should look something like this:
+
+```python
+[
+    "sid",
+    "id",
+    "position",
+    ...
+]
+```
+
+
+```python
+# Your code here (create more cells as needed)
+```
 
 
 ```python
@@ -208,6 +217,17 @@ column_data[:3]
       'flags': ['hidden']}]
 
 
+
+`column_data` currently contains significantly more information than we need. Extract just the values associated with the `name` keys using list comprehension, so we have a list of the column names.
+
+Now name this variable `column_names`.
+
+
+```python
+# Your code here (create more cells as needed)
+
+column_names = None
+```
 
 
 ```python
@@ -273,13 +293,20 @@ The columns we are looking for are called `CANDNAME` and `TOTALPAY`. Now that we
 
 ## Loop Over the Records to Find the Names and Payments
 
-The data records are contained in `data['data']`. Recall that the first (`0`-th) one is more of a header and should be skipped over.
+The data records are contained in `data['data']`. 
 
-Loop over the records in `data['data']` and extract the name and total payment from the city. Make sure you convert the total payment to a float, then make a tuple representing that candidate. Append the tuple to an overall list of results called `candidate_total_payments`.
+To loop over the records to find the names and payments, first we need to determine the indices of the candidate names and the total payments.
+
+Let `name_index` be the column names of `CANDNAME` and `total_payments_index` be the column names of `TOTALPAY`. After correctly defining `name_index` and `total_payments_index`, print their respective indices.
+
+
 
 
 ```python
 # Your code here (create more cells as needed)
+
+name_index = None
+total_payments_index = None
 ```
 
 
@@ -293,12 +320,23 @@ name_index = column_names.index("CANDNAME")
 total_payments_index = column_names.index("TOTALPAY")
 
 print("The candidate name is at index", name_index)
-print("The total payment amout is at index", total_payments_index)
+print("The total payment amount is at index", total_payments_index)
 ```
 
     The candidate name is at index 10
-    The total payment amout is at index 18
+    The total payment amount is at index 18
 
+
+Now loop over the records in `data['data']` and extract the name from `name_index` and total payment from `total_payments_index`. Make sure you convert the total payment to a float, then make a tuple representing that candidate. Append the tuple to an overall list of results called `candidate_total_payments`.
+
+Recall that the first (`0`-th) one is more of a header and should be skipped over.
+
+To verify that your loop worked, print the first five and the last five records.
+
+
+```python
+# Your code here (create more cells as needed)
+```
 
 
 ```python

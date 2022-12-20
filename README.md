@@ -177,6 +177,9 @@ The result should look something like this:
 
 ```python
 # Your code here (create more cells as needed)
+
+# With a list, it's often useful to look at the
+# first entry, or first few entries
 ```
 
 
@@ -305,6 +308,10 @@ Let `name_index` be the column names of `CANDNAME` and `total_payments_index` be
 ```python
 # Your code here (create more cells as needed)
 
+# In theory we could just look at the list and
+# count by hand to figure out the index of these
+# strings, but Python can do it for us
+
 name_index = None
 total_payments_index = None
 ```
@@ -336,6 +343,15 @@ To verify that your loop worked, print the first five and the last five records.
 
 ```python
 # Your code here (create more cells as needed)
+
+candidate_total_payments = []
+
+# Loop over records starting at index 1 to skip header
+
+
+
+# Print the first five and last five
+
 ```
 
 

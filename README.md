@@ -12,13 +12,13 @@ You will be able to:
 
 ## Your Task: Find the Total Payments for Each Candidate
 
-We will be using the same dataset, `nyc_2001_campaign_finance.json`, as in the previous lesson. Recall that the description is:
+We will be using the same dataset, `nyc_2001_campaign_finance.json`. The description of this file is:
 
 > A listing of public funds payments for candidates for City office during the 2001 election cycle
 
 For added context, the Ciy of New York provides matching funds for eligible contributions made to candidates, using various ratios depending on the contribution amount ([more details here](https://en.wikipedia.org/wiki/New_York_City_Campaign_Finance_Board#The_Campaign_Finance_Program)). So these are not the complete values of all funds raised by these candidates, they are the amounts matched by the city. For that reason we expect that some of the values will be identical for different candidates.
 
-Recall also that the dataset is separated into `meta`, which contains metadata, and `data`, which contains the actual campaign finance records. You will need to use the information in `meta` to understand how to interpret the information in `data`.
+The dataset is separated into `meta`, which contains metadata, and `data`, which contains the actual campaign finance records. You will need to use the information in `meta` to understand how to interpret the information in `data`.
 
 Your goal is to create a list of tuples, where the first value in each tuple is the name of a candidate in the 2001 election, and the second value is the total payments they received. The structure should look like this:
 
@@ -123,7 +123,7 @@ assert len(column_names) == 19
 assert "CANDNAME" in column_names and "TOTALPAY" in column_names
 ```
 
-Ok, now we know what each of the columns represents.
+Now we know what each of the columns represents.
 
 The columns we are looking for are called `CANDNAME` and `TOTALPAY`. Now that we have this list, we should be able to figure out which of the values in each record lines up with those column names.
 
@@ -208,4 +208,4 @@ pd.DataFrame(data=data['data'][1:], columns=column_names)
 
 ## Summary
 
-Congratulations! You've started exploring some more JSON data structures used for the web and got to practice data munging and exploring!
+You've started exploring some more JSON data structures used for the web and got to practice data munging and exploring.
